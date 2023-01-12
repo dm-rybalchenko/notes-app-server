@@ -1,5 +1,6 @@
 import NoteService from './NoteService.js';
 
+
 class NoteController {
   async getAll(req, res) {
     try {
@@ -12,7 +13,7 @@ class NoteController {
 
   async create(req, res) {
     try {
-      const note = await NoteService.create(req.body, req?.files?.file);
+      const note = await NoteService.create(req.body);
       return res.json(note);
     } catch (e) {
       res.status(500).json(e.message);
@@ -21,7 +22,7 @@ class NoteController {
 
   async update(req, res) {
     try {
-      const updatedNote = await NoteService.update(req.body, req?.files?.file);
+      const updatedNote = await NoteService.update(req.body);
       return res.json(updatedNote);
     } catch (e) {
       res.status(500).json(e.message);

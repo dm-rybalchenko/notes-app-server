@@ -1,54 +1,53 @@
-import * as uuid from 'uuid';
-import * as path from 'path';
-import * as fs from 'fs';
+import { cloudinary } from './File.js';
 
-const allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
-const allowedFileSize = 5 * 1000000; //5Mb
 
 class FileService {
-  saveFile(file) {
-    try {
-      const fileType = file.mimetype;
-
-      if (!allowedFileTypes.includes(fileType)) {
-        throw new Error('Unsupported file-type was provided');
-      }
-      if (file.size > allowedFileSize) {
-        throw new Error(`The file size is more than 5Mb. Upload a less one.`);
-      }
-
-      const fileName = uuid.v4() + '.' + fileType.slice(6);
-      const filePath = path.resolve('static', fileName);
-      file.mv(filePath);
-
-      return fileName;
-    } catch (e) {
-      console.log(e);
+  async upload(file) {
+    if (!file) {
+      throw new Error('File was not provided');
     }
+
+    const createdFile = await cloudinary.v2.uploader.upload(file.path);
+
+    return {
+      id: createdFile.public_id,
+      url: createdFile.secure_url,
+      name: file.originalname,
+    };
   }
 
-  updateFile(OldFileName, newFile) {
-    try {
-      const newFileName = this.saveFile(newFile);
-      this.deleteFile(OldFileName);
-
-      return newFileName;
-    } catch (e) {
-      console.log(e);
+  async update(id, file) {
+    if (!id) {
+      throw new Error('Id was not provided');
     }
+    if (!file) {
+      throw new Error('File was not provided');
+    }
+
+    const updatedFile = await cloudinary.v2.uploader.upload(file.path);
+    updatedFile && (await cloudinary.v2.uploader.destroy(id));
+
+    return {
+      id: updatedFile.public_id,
+      url: updatedFile.secure_url,
+      name: file.originalname,
+    };
   }
 
-  deleteFile(fileName) {
-    try {
-      const filePath = path.resolve('static', fileName);
-      if (fs.existsSync(filePath) && fileName) {
-        fs.unlinkSync(filePath);
-      }
-
-      return fileName;
-    } catch (e) {
-      console.log(e);
+  async delete(id) {
+    if (!id) {
+      throw new Error('Id was not provided');
     }
+
+    const deletedFile = await cloudinary.v2.uploader.destroy(id);
+    if (deletedFile.result === 'not found') {
+      throw new Error(`File with id [${id}] was not found`);
+    }
+
+    return {
+      id: id,
+      success: deletedFile.result,
+    };
   }
 }
 
