@@ -1,16 +1,15 @@
+import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import NoteRouter from './src/Note/NoteRouter.js';
-import fileUpload from 'express-fileupload';
+import FileRouter from './src/File/FileRouter.js';
 
 const PORT = process.env.PORT || 5000;
-const DB_URL =
-  'mongodb+srv://note-admin:789456@cluster0.rsxclrx.mongodb.net/?retryWrites=true&w=majority';
+const DB_URL = process.env.MONGO_DB_URL;
 const app = express();
 
 app.use(express.json());
-app.use(express.static('static'));
-app.use(fileUpload({}));
+app.use('/', FileRouter);
 app.use('/', NoteRouter);
 
 mongoose.set('strictQuery', true);
@@ -18,7 +17,7 @@ mongoose.set('strictQuery', true);
 async function startApp() {
   try {
     await mongoose.connect(DB_URL);
-    app.listen(PORT, () => console.log(`Сервер запущен на порте: ${PORT}`));
+    app.listen(PORT, () => console.log(`Server starts on port: ${PORT}`));
   } catch (e) {
     console.log(e);
   }

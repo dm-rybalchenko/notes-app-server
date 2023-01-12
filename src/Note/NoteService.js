@@ -1,5 +1,5 @@
-import FileService from '../File/FileService.js';
 import Note from './Note.js';
+
 
 class NoteService {
   async getAll() {
@@ -7,27 +7,20 @@ class NoteService {
     return notes;
   }
 
-  async create(note, file) {
-	if (file){
-		const fileName = FileService.saveFile(file);
-		note.file = fileName;
-	}
+  async create(note) {
     const newNote = await Note.create(note);
     return newNote;
   }
 
-  async update(note, file) {
+  async update(note) {
+    if (!note) {
+      throw new Error('Note object was not provided');
+    }
     if (!note._id) {
       throw new Error('Id was not provided');
     }
 
-	if (file){
-		const oldNote = await Note.findById(note._id);
-		const fileName = FileService.updateFile(oldNote.file, file);
-		note.file = fileName;
-	}
-
-	const updatedNote = await Note.findByIdAndUpdate(note._id, note, {
+    const updatedNote = await Note.findByIdAndUpdate(note._id, note, {
       new: true,
     });
 
@@ -39,9 +32,9 @@ class NoteService {
       throw new Error('Id was not provided');
     }
     const deletedNote = await Note.findByIdAndDelete(id);
-	
-    if (deletedNote.file) {
-      FileService.deleteFile(deletedNote.file);
+
+    if (deletedNote === null) {
+      throw new Error(`Note with id [${id}] was not found`);
     }
 
     return deletedNote;
