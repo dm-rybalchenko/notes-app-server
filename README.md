@@ -11,6 +11,8 @@
 
 # API
 
+Description API methods and endpoints.
+
 ## Note-service endpoints:
 
 ### Get all notes. Endpoint `/`, method `GET`.
@@ -96,7 +98,7 @@ response: deleted note
 errors: plain text or Error odject with 500 status
 
 
-## File-service endpoints
+## File-service endpoints:
 
 ### Upload file. Endpoint `/upload`, method `POST`.
 request: form-data with a file in field `file`
