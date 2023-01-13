@@ -2,10 +2,10 @@ import mongoose from 'mongoose';
 
 
 const Note = new mongoose.Schema({
-  title: { type: String, required: true },
-  body: { type: String, required: true },
-  tags: { type: [String], required: true },
-  date: { type: String, required: true },
+  title: { type: String, required: false },
+  body: { type: String, required: false },
+  tags: { type: [String], required: false },
+  date: { type: String, required: false },
   file: {
     type: {
       id: String,
