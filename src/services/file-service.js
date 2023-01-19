@@ -1,7 +1,7 @@
 import FileDto from '../dtos/file-dto.js';
 import File from '../models/file-model.js';
 import ApiError from '../exeptions/api-error.js';
-
+import noteModel from '../models/note-model.js';
 
 class FileService {
   async upload(file) {
@@ -10,43 +10,60 @@ class FileService {
     }
 
     const createdFile = await File.upload(file.path);
-	const fileData = new FileDto(createdFile, file.originalname)
+    const fileData = new FileDto(createdFile, file.originalname);
 
     return fileData;
   }
 
-  async update(id, file) {
-    if (!id) {
+  async update(userId, fileId, file) {
+    if (!fileId) {
       throw ApiError.BadRequest('Не предоставлен id файла');
     }
     if (!file?.path) {
       throw ApiError.BadRequest('Файл или путь к нему не был пердоставлен');
     }
 
-    const updatedFile = await File.upload(file.path);
-	// TODO разобраться с целесообразностью ошибки ниже. Подумать об бработке ошибок обращения к БД и Облаку
-	if(!updatedFile){
-		throw ApiError.ServerError('Файл не был обновлен. Повторите позже, пожалуйста')
-	}
+    const note = await noteModel.findOne({ 'file.id': fileId });
+    if (note._owner.toString() !== userId) {
+      throw ApiError.BadRequest('У вас нет доступа к этому файлу');
+    }
 
-    await File.destroy(id);
-	const fileData = new FileDto(updatedFile, file.originalname)
+    const updatedFile = await File.upload(file.path);
+    if (!updatedFile) {
+      throw ApiError.ServerError(
+        'Файл не был обновлен. Повторите позже, пожалуйста'
+      );
+    }
+
+    await File.destroy(fileId);
+    const fileData = new FileDto(updatedFile, file.originalname);
+
+    note.file = fileData;
+    note.save();
 
     return fileData;
   }
 
-  async delete(id) {
-    if (!id) {
+  async delete(userId, fileId) {
+    if (!fileId) {
       throw ApiError.BadRequest('Не предоставлен id файла');
     }
 
-    const deletedFile = await File.destroy(id);
-    if (deletedFile.result === 'not found') {
-      throw ApiError.BadRequest(`Файл c id [${id}] не найден`);
+    const note = await noteModel.findOne({ 'file.id': fileId });
+    if (note._owner.toString() !== userId) {
+      throw ApiError.BadRequest('У вас нет доступа к этому файлу');
     }
 
+    const deletedFile = await File.destroy(fileId);
+    if (deletedFile.result === 'not found') {
+      throw ApiError.BadRequest(`Файл c id [${fileId}] не найден`);
+    }
+
+    note.file = undefined;
+	note.save();
+
     return {
-      id: id,
+      id: fileId,
       success: deletedFile.result,
     };
   }

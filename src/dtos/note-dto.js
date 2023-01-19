@@ -12,6 +12,13 @@ export default class NoteDto {
     this.body = model.body;
     this.date = model.date;
     this.tags = model.tags;
-    this.file = model.file;
+
+    if (model.file) {
+      this.file = {
+        id: model.file.id,
+        url: model.file.url,
+        name: model.file.name,
+      };
+    }
   }
 }

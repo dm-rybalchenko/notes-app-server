@@ -13,7 +13,7 @@ class FileController {
 
   async update(req, res, next) {
     try {
-      const updatedFile = await fileService.update(req.params.id, req.file);
+      const updatedFile = await fileService.update(req.user.id, req.params.id, req.file);
       return res.json(updatedFile);
     } catch (e) {
       next(e);
@@ -22,7 +22,7 @@ class FileController {
 
   async delete(req, res, next) {
     try {
-      const deletedFile = await fileService.delete(req.params.id);
+      const deletedFile = await fileService.delete(req.user.id, req.params.id);
       return res.json(deletedFile);
     } catch (e) {
       next(e);
