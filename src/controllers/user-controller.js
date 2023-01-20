@@ -2,11 +2,10 @@ import userService from '../services/user-service.js';
 import { validationResult } from 'express-validator';
 import ApiError from '../exeptions/api-error.js';
 
-
 const cookieOptions = {
   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   httpOnly: true,
-  // secure: true - если используем https
+  secure: true
 };
 
 class UserController {
@@ -30,6 +29,11 @@ class UserController {
 
   async login(req, res, next) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
+      }
+
       const { email, password } = req.body;
       const userData = await userService.login(email, password);
 
@@ -45,7 +49,10 @@ class UserController {
     try {
       const { refreshToken } = req.cookies;
       const token = await userService.logout(refreshToken);
-      res.clearCookie('refreshToken');
+      res.clearCookie('refreshToken', {
+        expires: new Date(Date.now() + 5 * 1000),
+        httpOnly: true,
+      });
 
       return res.json(token);
     } catch (e) {

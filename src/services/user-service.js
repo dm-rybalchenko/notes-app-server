@@ -36,7 +36,7 @@ class UserSerice {
       throw ApiError.BadRequest(`Пользователь с email ${email} не зарегистрирован`);
     }
 
-    const isPassEaquals = bcrypt.compare(password, user.password);
+	const isPassEaquals = bcrypt.compare(password, user.password);
     if (!isPassEaquals) {
       throw ApiError.BadRequest('Неверный пароль');
     }
