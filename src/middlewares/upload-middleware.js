@@ -1,15 +1,9 @@
 import multer from 'multer';
-import cloudinary from 'cloudinary';
+import ApiError from '../exeptions/api-error.js';
 
 
 const allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
 const allowedFileSize = 5 * 1000000; //10Mb
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 const uploader = multer({
   storage: multer.diskStorage({}),
@@ -19,9 +13,13 @@ const uploader = multer({
       cb(null, true);
     } else {
       cb(null, false);
-      return cb(new Error('Only .png, .gif, .jpg and .jpeg formats allowed!'));
+      return cb(
+        ApiError.BadRequest(
+          'Для загрузки разрешены следующие форматы файлов: .png, .gif, .jpg и .jpeg!'
+        )
+      );
     }
   },
 }).single('file');
 
-export { cloudinary, uploader };
+export default uploader;
