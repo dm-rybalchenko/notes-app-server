@@ -18,12 +18,12 @@ class MailCervice {
     await this.tarnsporter.sendMail({
       from: process.env.SMTP_USER,
       to,
-      subject: 'Фктивация аккаунта на ' + process.env.URL_CLIENT,
+      subject: 'Активация аккаунта на сервисе Note App',
       text: '',
       html: `
 			<div>
-				<h1>Для активации аккаунта перейдите по ссылке</h1>
-				<a href="${link}">${link}</a>
+				<h1>Активация аккаунта на сервисе Note App</h1>
+				<p>Вы зарегистрировались на сайте <a href="${process.env.URL_CLIENT}">Note App</a>, чтобы пользоваться сервисом — нужно подтвердить ваш почтовый адрес, для этого нажмите на ссылку <a href="${link}">«Активировать аккаунт»</a></p>
 			</div>
 			`,
     });
