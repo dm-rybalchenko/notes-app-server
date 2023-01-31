@@ -1,4 +1,5 @@
 import noteModel from '../models/note-model.js';
+import File from '../models/file-model.js';
 import ApiError from '../exeptions/api-error.js';
 import NoteDto from '../dtos/note-dto.js';
 
@@ -58,6 +59,9 @@ class NoteService {
     }
 
     const deletedNote = await noteModel.findByIdAndDelete(id);
+	if(deletedNote.file?.id){
+		await File.destroy(chosenNote.file?.id)
+	}
     const noteData = new NoteDto(deletedNote);
 
     return noteData;

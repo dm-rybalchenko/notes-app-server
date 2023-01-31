@@ -6,7 +6,12 @@ const allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
 const allowedFileSize = 5 * 1000000; //10Mb
 
 const uploader = multer({
-  storage: multer.diskStorage({}),
+  storage: multer.diskStorage({
+	filename: (req, file, cb) =>{
+		file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8')
+		cb(null, file.originalname);
+	}
+  }),
   limits: { fileSize: allowedFileSize },
   fileFilter: (req, file, cb) => {
     if (allowedFileTypes.includes(file.mimetype)) {
