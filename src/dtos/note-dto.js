@@ -4,6 +4,8 @@ export default class NoteDto {
   body;
   tags;
   date;
+  pinned;
+  favorite;
   file;
 
   constructor(model) {
@@ -11,6 +13,8 @@ export default class NoteDto {
     this.title = model.title;
     this.body = model.body;
     this.date = model.date;
+    this.pinned = model.pinned;
+    this.favorite = model.favorite;
     this.tags = model.tags;
 
     if (model.file) {
