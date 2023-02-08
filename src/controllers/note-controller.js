@@ -11,6 +11,15 @@ class NoteController {
     }
   }
 
+  async getById(req, res, next) {
+    try {
+      const note = await noteService.getById(req.user.id, req.params.id);
+      return res.json(note);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async create(req, res, next) {
     try {
       const note = await noteService.create(req.user.id, req.body);

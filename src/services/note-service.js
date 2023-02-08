@@ -12,6 +12,25 @@ class NoteService {
     return notesArray;
   }
 
+  async getById(userId, id) {
+    if (!id) {
+      throw ApiError.BadRequest('Не предоставлен id записи');
+    }
+
+    const note = await noteModel.findById(id);
+    if (!note) {
+      throw ApiError.BadRequest(`Запись с id [${id}] не найдена`);
+    }
+
+    if (note._owner.toString() !== userId) {
+      throw ApiError.BadRequest('У вас нет доступа к этой записи');
+    }
+
+    const noteData = new NoteDto(note);
+
+    return noteData;
+  }
+
   async create(userId, note) {
     const newNote = await noteModel.create({ ...note, _owner: userId });
     const noteData = new NoteDto(newNote);
@@ -59,9 +78,9 @@ class NoteService {
     }
 
     const deletedNote = await noteModel.findByIdAndDelete(id);
-	if(deletedNote.file?.id){
-		await File.destroy(chosenNote.file?.id)
-	}
+    if (deletedNote.file?.id) {
+      await File.destroy(chosenNote.file?.id);
+    }
     const noteData = new NoteDto(deletedNote);
 
     return noteData;

@@ -24,7 +24,7 @@ class FileService {
     }
 
     const note = await noteModel.findOne({ 'file.id': fileId });
-    if (note._owner.toString() !== userId) {
+    if (note?._owner?.toString() !== userId) {
       throw ApiError.BadRequest('У вас нет доступа к этому файлу');
     }
 
@@ -50,7 +50,7 @@ class FileService {
     }
 
     const note = await noteModel.findOne({ 'file.id': fileId });
-    if (note._owner.toString() !== userId) {
+    if (note?._owner?.toString() !== userId) {
       throw ApiError.BadRequest('У вас нет доступа к этому файлу');
     }
 

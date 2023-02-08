@@ -6,6 +6,7 @@ import authMiddleware from '../middlewares/auth-middleware.js';
 const noteRouter = new Router();
 
 noteRouter.get('/', authMiddleware, noteController.getAll);
+noteRouter.get('/:id', authMiddleware, noteController.getById);
 noteRouter.post('/', authMiddleware, noteController.create);
 noteRouter.put('/', authMiddleware, noteController.update);
 noteRouter.delete('/:id', authMiddleware, noteController.delete);
